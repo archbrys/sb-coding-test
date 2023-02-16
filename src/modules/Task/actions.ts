@@ -1,11 +1,11 @@
 import axios from "axios";
 import { Dispatch } from "redux"
-import { FETCH_STATUS, FETCH_TASK } from "./constants";
+import { FETCH_STATUS, FETCH_TASK, OVERRIDE_STATUS } from "./constants";
+import { IStatus, ITask } from "./interface";
 
 export const fetchTasks =
   (): any =>
   async (dispatch: Dispatch): Promise<any> => {
-    console.log('here')
     dispatch({
       type: FETCH_TASK.REQUEST,
     })
@@ -30,7 +30,6 @@ export const fetchTasks =
 export const fetchStatus =
   (): any =>
   async (dispatch: Dispatch): Promise<any> => {
-    console.log('here')
     dispatch({
       type: FETCH_STATUS.REQUEST,
     })
@@ -50,4 +49,20 @@ export const fetchStatus =
         type: FETCH_STATUS.FAILED,
       })
     }
+  }
+
+
+
+export const overrideAllStatus =
+  (statuses: IStatus[]): any =>
+  async (dispatch: Dispatch): Promise<any> => {
+    const overrided = statuses.map((status) => {
+      return {...status, status: "override"}
+    })
+    dispatch({
+      type: OVERRIDE_STATUS,
+      payload: {
+        status: overrided
+      }
+    })
   }

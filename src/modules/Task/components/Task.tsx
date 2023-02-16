@@ -1,9 +1,15 @@
-import react, { useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { fetchTasks, fetchStatus } from "../actions";
+import react, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootReducer } from "../../../store/interface";
+import { fetchTasks, fetchStatus, overrideAllStatus } from "../actions";
 import { Color, ColorName } from "../constants";
-import useGetTaskWithStatus from "../hooks/useGetTaskWithStatus";
-import { ITask } from "../interface";
+import { IStatus, ITask } from "../interface";
 import {
   Column,
   Container,
@@ -18,23 +24,42 @@ import {
 } from "../styles";
 
 const Task = (): JSX.Element => {
+  const prevTask = useRef<IStatus[]>();
   const dispatch = useDispatch();
-
-  const tasks = useGetTaskWithStatus();
+  const [taskWithStatus, setTaskWithStatus] = useState<ITask[]>([]);
+  const { tasks, status } = useSelector((state: IRootReducer) => ({
+    tasks: state.task.tasks,
+    status: state.task.status,
+  }));
 
   useEffect(() => {
     dispatch(fetchTasks());
     dispatch(fetchStatus());
   }, []);
 
+  useEffect(() => {
+    if (JSON.stringify(status) !== JSON.stringify(prevTask.current)) {
+      const tS = tasks.map((task) => {
+        const _status = status.find((s) => s.taskId === task.id);
+        return _status ? { ...task, status: _status.status } : task;
+      });
+
+      setTaskWithStatus(tS);
+    }
+
+    prevTask.current = status;
+  }, [tasks, status]);
+
+  const resetStatus = () => {
+    dispatch(fetchStatus());
+  };
+
   const findCategories = useCallback((arr: ITask[], key: string) => {
     return arr.filter((value) => value.category === key);
   }, []);
 
-  console.log(tasks);
-
   const getItem = (key: string): JSX.Element => {
-    const category = findCategories(tasks, key);
+    const category = findCategories(taskWithStatus, key);
     const color = (status: ColorName) => Color[status];
     return (
       <>
@@ -48,12 +73,16 @@ const Task = (): JSX.Element => {
     );
   };
 
+  const overrideStatus = () => {
+    dispatch(overrideAllStatus(status));
+  };
+
   return (
     <Container>
       <Title>Categories and Tasks</Title>
       <Column>
-        <Button>Override Statuses</Button>
-        <Button>Override Statuses</Button>
+        <Button onClick={overrideStatus}>Override Statuses</Button>
+        <Button onClick={resetStatus}>Reset Statuses</Button>
       </Column>
       <Column>
         <Row>

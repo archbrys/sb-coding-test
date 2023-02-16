@@ -14,6 +14,7 @@ export const FETCH_STATUS = {
   SUCCESS: 'FETCH_STATUS/SUCCESS',
   FAILED: 'FETCH_STATUS/FAILED'
 }
+export const OVERRIDE_STATUS = `${name}/OVERRIDE_STATUS`
 
 
 // STATE
@@ -27,7 +28,8 @@ export const INITIAL_STATE: ITaskState = {
 export enum Color {
   pass = "#ADFF2F",
   fail = "#FF0000",
-  submit = "#87CEEB"
+  submit = "#87CEEB",
+  override = "#f6f217"
 }
 
 export type ColorName = keyof typeof Color

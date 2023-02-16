@@ -1,4 +1,4 @@
-import { FETCH_STATUS, FETCH_TASK, INITIAL_STATE } from './constants'
+import { FETCH_STATUS, FETCH_TASK, INITIAL_STATE, OVERRIDE_STATUS } from './constants'
 import { ITaskState, TaskAction } from './interface'
 
 export const reducer = (
@@ -43,6 +43,13 @@ export const reducer = (
         return {
           ...state,
           isLoadingStatus: false,
+        }
+
+      case OVERRIDE_STATUS:
+        
+        return {
+          ...state,
+          status:action.payload.status
         }
    
     default:
